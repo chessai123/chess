@@ -5,11 +5,12 @@ import math
 
 screenW=400
 screenH=400
+clock = pygame.time.Clock()
 
 black = (0,0,0)
 board_size = 8
 column_letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-
+square_size = 50
 brown_square_img    = "images/brown_square.png"
 white_square_img    = "images/white_square.png"
 cyanid_square_img   = "images/cyan_square.png"
@@ -35,8 +36,6 @@ class chessb:
         self.screen = pygame.display.set_mode((screenW,screenH))
         pygame.display.set_caption('AlfaGeir')
         self.LoadImages()
-        self.square_size = 50
-        #self.screen.fill(black)
         self.board = chess.Board()
         self.from_position = None
         self.to_position = None
@@ -45,32 +44,32 @@ class chessb:
         self.white_block = pygame.image.load(white_square_img)
         self.brown_block = pygame.image.load(brown_square_img)
         self.highlight_block = pygame.image.load(cyanid_square_img)
-        self.highlight_block = pygame.transform.scale(self.highlight_block, (50,50))
+        self.highlight_block = pygame.transform.scale(self.highlight_block, (square_size,square_size))
 
         self.black_pawn = pygame.image.load(black_pawn_img)
-        self.black_pawn = pygame.transform.scale(self.black_pawn, (50,50))
+        self.black_pawn = pygame.transform.scale(self.black_pawn, (square_size,square_size))
         self.white_pawn = pygame.image.load(white_pawn_img)
-        self.white_pawn = pygame.transform.scale(self.white_pawn, (50,50))     
+        self.white_pawn = pygame.transform.scale(self.white_pawn, (square_size,square_size))     
         self.black_bishop = pygame.image.load(black_bishop_img)
-        self.black_bishop = pygame.transform.scale(self.black_bishop, (50,50))
+        self.black_bishop = pygame.transform.scale(self.black_bishop, (square_size,square_size))
         self.white_bishop = pygame.image.load(white_bishop_img)
-        self.white_bishop = pygame.transform.scale(self.white_bishop, (50,50)) 
+        self.white_bishop = pygame.transform.scale(self.white_bishop, (square_size,square_size)) 
         self.black_king = pygame.image.load(black_king_img)
-        self.black_king = pygame.transform.scale(self.black_king, (50,50))
+        self.black_king = pygame.transform.scale(self.black_king, (square_size,square_size))
         self.white_king = pygame.image.load(white_king_img)
-        self.white_king = pygame.transform.scale(self.white_king, (50,50)) 
+        self.white_king = pygame.transform.scale(self.white_king, (square_size,square_size)) 
         self.black_horse = pygame.image.load(black_horse_img)
-        self.black_horse = pygame.transform.scale(self.black_horse, (50,50))
+        self.black_horse = pygame.transform.scale(self.black_horse, (square_size,square_size))
         self.white_horse = pygame.image.load(white_horse_img)
-        self.white_horse = pygame.transform.scale(self.white_horse, (50,50)) 
+        self.white_horse = pygame.transform.scale(self.white_horse, (square_size,square_size)) 
         self.black_queen = pygame.image.load(black_queen_img)
-        self.black_queen = pygame.transform.scale(self.black_queen, (50,50))
+        self.black_queen = pygame.transform.scale(self.black_queen, (square_size,square_size))
         self.white_queen = pygame.image.load(white_queen_img)
-        self.white_queen = pygame.transform.scale(self.white_queen, (50,50)) 
+        self.white_queen = pygame.transform.scale(self.white_queen, (square_size,square_size)) 
         self.black_tower = pygame.image.load(black_tower_img)
-        self.black_tower = pygame.transform.scale(self.black_tower, (50,50))
+        self.black_tower = pygame.transform.scale(self.black_tower, (square_size,square_size))
         self.white_tower = pygame.image.load(white_tower_imp)
-        self.white_tower = pygame.transform.scale(self.white_tower, (50,50)) 
+        self.white_tower = pygame.transform.scale(self.white_tower, (square_size,square_size)) 
 
     def convert_to_screen_coordinates(self, column, row):
         x = row * (screenH/board_size)
@@ -84,7 +83,7 @@ class chessb:
         for i in range(board_size):
             for j in range(board_size):
                 (x, y) = self.convert_to_screen_coordinates(i, j)
-                if (current_square%2) == 0:
+                if (current_square % 2) == 0:
                     self.screen.blit(self.brown_block, (x,y))
                 else:
                     self.screen.blit(self.white_block, (x,y))
@@ -143,8 +142,8 @@ class chessb:
         pass
 
     def convert_to_board_pos(self, x, y):
-        row = 8-math.floor(y/50) 
-        column = math.floor(x/50)
+        row = 8 - math.floor(y/square_size) 
+        column = math.floor(x/square_size)
         column = column_letter[column]
         pos = column + str(row)
         return pos
@@ -157,36 +156,38 @@ class chessb:
             return False
             
 
-    def run(self):
-        
-        
+    def game_loop(self):
         while True:
-            self.draw()
-            event = pygame.event.wait()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:            
-                    pos = event.pos
+            clock.tick(60)        
+            for event in pygame.event.get():
+                self.draw()
+                #event = pygame.event.wait()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        clicked = True            
+                        pos = event.pos
                     
-                    if self.from_position == None:
-                        board_pos = self.convert_to_board_pos(pos[0], pos[1])
-                        print(board_pos)
-                        self.from_position = board_pos
-                
-                    if self.from_position != None and self.to_position == None:
-                        board_pos = self.convert_to_board_pos(pos[0], pos[1])
-                        self.to_position = board_pos
-                        move = self.from_position + self.to_position
-                        if self.is_legal_move(move):
-                            print("that is a move")
-                        else:
-                            print("not a legal move")
-                        
+                        # maps from pos
+                        if self.from_position == None:
+                            board_pos = self.convert_to_board_pos(pos[0], pos[1])
+                            print(board_pos)
+                            self.from_position = board_pos
 
+                        # checks from and to pos & checks for legality of said pos/move
+                        if self.from_position != None and self.to_position == None:
+                            board_pos = self.convert_to_board_pos(pos[0], pos[1])
+                            self.to_position = board_pos
+                            move = self.from_position + self.to_position
+                            print(move)
+
+                            # if self.is_legal_move(move):
+                            #     print("that is a move")
+                            # else:
+                            #     print("not a legal move")
                     
             if event.type == pygame.QUIT:
                 sys.exit()
         
-
 if __name__ == "__main__":
     board = chessb()
-    board.run()
+    board.game_loop()
