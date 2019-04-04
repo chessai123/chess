@@ -1,16 +1,18 @@
 import pygame
 import sys
 import chess
-import time
+import math
 
 screenW=400
 screenH=400
 
 black = (0,0,0)
 board_size = 8
+column_letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
 brown_square_img    = "images/brown_square.png"
 white_square_img    = "images/white_square.png"
+cyanid_square_img   = "images/cyan_square.png"
 
 black_pawn_img      = "images/Chess_tile_pd.png"
 white_pawn_img      = "images/Chess_tile_pl.png"
@@ -25,9 +27,6 @@ white_queen_img     = "images/Chess_tile_ql.png"
 black_tower_img     = "images/Chess_tile_rd.png"
 white_tower_imp     = "images/Chess_tile_rl.png"
 
-bk = "e8"
-wk = "e1"
-
 
 class chessb:
     def __init__(self):
@@ -39,10 +38,14 @@ class chessb:
         self.square_size = 50
         #self.screen.fill(black)
         self.board = chess.Board()
+        self.from_position = None
+        self.to_position = None
 
     def LoadImages(self):
         self.white_block = pygame.image.load(white_square_img)
         self.brown_block = pygame.image.load(brown_square_img)
+        self.highlight_block = pygame.image.load(cyanid_square_img)
+        self.highlight_block = pygame.transform.scale(self.highlight_block, (50,50))
 
         self.black_pawn = pygame.image.load(black_pawn_img)
         self.black_pawn = pygame.transform.scale(self.black_pawn, (50,50))
@@ -74,6 +77,7 @@ class chessb:
         y = column * (screenW/board_size)
         return (x, y)
 
+
     def draw(self):
         self.screen.fill(black)
         current_square = 0
@@ -87,11 +91,19 @@ class chessb:
                 current_square += 1
             current_square += 1
 
+        fen = self.board.fen().split(" ", 1)
+        fen = fen[0].split("/", 8)
 
-        """rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"""
-        fen = chess.STARTING_BOARD_FEN.split("/", 8)
+        if self.from_position:
+            col = 1
+            for i in column_letter:
+                if i == self.from_position[0]:
+                    break
+                col += 1
+            row = 7 - int(self.from_position[1])
+            (x,y) = self.convert_to_screen_coordinates(col, row)
+            self.screen.blit(self.highlight_block, (x,y))
         
-        print(fen)
         current_square = 0
         for i in range(board_size):
             for j in range(board_size):
@@ -124,16 +136,57 @@ class chessb:
                     self.screen.blit(self.black_bishop, (x,y))
                 if fen[i][j] == "B":
                     self.screen.blit(self.white_bishop, (x,y))
-                
-            
-        pygame.display.update()
-                
 
+        pygame.display.update()
+
+    def update(self):
+        pass
+
+    def convert_to_board_pos(self, x, y):
+        row = 8-math.floor(y/50) 
+        column = math.floor(x/50)
+        column = column_letter[column]
+        pos = column + str(row)
+        return pos
+
+    def is_legal_move(self, move):
+        print(self.board.legal_moves)
+        if chess.Move.from_uci(move) in self.board.legal_moves:
+            return True
+        else:
+            return False
+            
+
+    def run(self):
+        
+        
+        while True:
+            self.draw()
+            event = pygame.event.wait()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:            
+                    pos = event.pos
+                    
+                    if self.from_position == None:
+                        board_pos = self.convert_to_board_pos(pos[0], pos[1])
+                        print(board_pos)
+                        self.from_position = board_pos
+                
+                    if self.from_position != None and self.to_position == None:
+                        board_pos = self.convert_to_board_pos(pos[0], pos[1])
+                        self.to_position = board_pos
+                        move = self.from_position + self.to_position
+                        if self.is_legal_move(move):
+                            print("that is a move")
+                        else:
+                            print("not a legal move")
+                        
+
+                    
+            if event.type == pygame.QUIT:
+                sys.exit()
+        
 
 if __name__ == "__main__":
     board = chessb()
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-        board.draw()
+    board.run()
