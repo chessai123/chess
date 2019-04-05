@@ -105,8 +105,14 @@ class chessb:
         
         current_square = 0
         for i in range(board_size):
+            print(fen[i])
             for j in range(board_size):
                 (x, y) = self.convert_to_screen_coordinates(i, j)
+                print(j)
+                if j >= board_size:
+                    break
+
+                
 
                 if fen[i][j] == "8":
                     break
@@ -136,6 +142,12 @@ class chessb:
                 if fen[i][j] == "B":
                     self.screen.blit(self.white_bishop, (x,y))
 
+                if type(fen[i][j]) == type(4):
+                    print("type check")
+                    j += int(fen[i][j])
+                else:
+                    current_square += 1
+            current_square += 1
         pygame.display.update()
 
     def update(self):
@@ -150,40 +162,50 @@ class chessb:
 
     def is_legal_move(self, move):
         print(self.board.legal_moves)
-        if chess.Move.from_uci(move) in self.board.legal_moves:
-            return True
+        Nf3 = chess.Move.from_uci(move)
+        if Nf3 in self.board.legal_moves:
+            self.board.push(Nf3) 
+            print(self.board.fen())
+            self.draw()
         else:
             return False
             
 
     def game_loop(self):
-        while True:
-            clock.tick(60)        
+        #pygame.event.set_blocked(pygame.locals.MOUSEMOTION)
+        self.draw()
+        while True:            
             for event in pygame.event.get():
-                self.draw()
+                
                 #event = pygame.event.wait()
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONUP:
+                    self.draw()
                     if event.button == 1:
+                        button_states = pygame.mouse.get_pressed()
                         clicked = True            
-                        pos = event.pos
-                    
+                        pos = pygame.mouse.get_pos()
+                        
+                         # checks from and to pos & checks for legality of said pos/move
+                        if self.from_position != None and self.to_position == None:
+                            print("second check")
+                            board_pos = self.convert_to_board_pos(pos[0], pos[1])
+                            self.to_position = board_pos
+                            move = self.from_position + self.to_position
+                            status = self.is_legal_move(move)
+                            if status == False:
+                                print("not a legal move")
+
+
+                            self.from_position = None
+                            self.to_position = None
+
                         # maps from pos
                         if self.from_position == None:
                             board_pos = self.convert_to_board_pos(pos[0], pos[1])
                             print(board_pos)
                             self.from_position = board_pos
+                            pos = None
 
-                        # checks from and to pos & checks for legality of said pos/move
-                        if self.from_position != None and self.to_position == None:
-                            board_pos = self.convert_to_board_pos(pos[0], pos[1])
-                            self.to_position = board_pos
-                            move = self.from_position + self.to_position
-                            print(move)
-
-                            # if self.is_legal_move(move):
-                            #     print("that is a move")
-                            # else:
-                            #     print("not a legal move")
                     
             if event.type == pygame.QUIT:
                 sys.exit()
