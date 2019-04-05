@@ -2,6 +2,7 @@ import pygame
 import sys
 import chess
 import math
+import fenparser as fp
 
 screenW=400
 screenH=400
@@ -75,9 +76,9 @@ class chessb:
         x = row * (screenH/board_size)
         y = column * (screenW/board_size)
         return (x, y)
-
-
-    def draw(self):
+    
+    def draw_board(self):
+        # draw the squares on the board 8*8
         self.screen.fill(black)
         current_square = 0
         for i in range(board_size):
@@ -89,10 +90,16 @@ class chessb:
                     self.screen.blit(self.white_block, (x,y))
                 current_square += 1
             current_square += 1
+        
 
+    def draw(self):
+        self.draw_board()
+        
+        # parse and filter the piece string
         fen = self.board.fen().split(" ", 1)
         fen = fen[0].split("/", 8)
-
+        
+        # find from pos - to pos
         if self.from_position:
             col = 1
             for i in column_letter:
@@ -103,6 +110,7 @@ class chessb:
             (x,y) = self.convert_to_screen_coordinates(col, row)
             self.screen.blit(self.highlight_block, (x,y))
         
+        # iterate over board squares (rows,columns) and convert coordinates
         current_square = 0
         for i in range(board_size):
             print(fen[i])
@@ -112,11 +120,11 @@ class chessb:
                 if j >= board_size:
                     break
 
-                
-
+                # stop if board array is out of range
                 if fen[i][j] == "8":
                     break
                 
+                # draw piece according to piece board pos 
                 if fen[i][j] == "p":
                     self.screen.blit(self.black_pawn, (x,y))
                 if fen[i][j] == "P":
@@ -141,7 +149,8 @@ class chessb:
                     self.screen.blit(self.black_bishop, (x,y))
                 if fen[i][j] == "B":
                     self.screen.blit(self.white_bishop, (x,y))
-
+                
+                
                 if type(fen[i][j]) == type(4):
                     print("type check")
                     j += int(fen[i][j])
@@ -161,7 +170,7 @@ class chessb:
         return pos
 
     def is_legal_move(self, move):
-        print(self.board.legal_moves)
+        #print(self.board.legal_moves)
         Nf3 = chess.Move.from_uci(move)
         if Nf3 in self.board.legal_moves:
             self.board.push(Nf3) 
@@ -172,30 +181,25 @@ class chessb:
             
 
     def game_loop(self):
-        #pygame.event.set_blocked(pygame.locals.MOUSEMOTION)
         self.draw()
         while True:            
             for event in pygame.event.get():
-                
-                #event = pygame.event.wait()
                 if event.type == pygame.MOUSEBUTTONUP:
                     self.draw()
                     if event.button == 1:
-                        button_states = pygame.mouse.get_pressed()
-                        clicked = True            
+                        #button_states = pygame.mouse.get_pressed()            
                         pos = pygame.mouse.get_pos()
-                        
-                         # checks from and to pos & checks for legality of said pos/move
+                        # checks from and to pos & checks for legality of said pos/move
                         if self.from_position != None and self.to_position == None:
-                            print("second check")
+                            #print("second check")
                             board_pos = self.convert_to_board_pos(pos[0], pos[1])
                             self.to_position = board_pos
                             move = self.from_position + self.to_position
+                            print(move)
                             status = self.is_legal_move(move)
                             if status == False:
                                 print("not a legal move")
-
-
+                            
                             self.from_position = None
                             self.to_position = None
 
