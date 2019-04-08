@@ -88,27 +88,7 @@ class chessb:
                     self.screen.blit(self.white_block, (x,y))
                 current_square += 1
             current_square += 1
-        
-    # def draw(self):
-    #     self.draw_board()
-        
-    #     # parse and filter the piece string
-    #     fen = self.board.fen().split(" ", 1)
-    #     fen = fen[0].split("/", 8)
-        
-    #     # find from pos - to pos
-    #     if self.from_position:
-    #         col = 1
-    #         for i in column_letter:
-    #             if i == self.from_position[0]:
-    #                 break
-    #             col += 1
-    #         row = 7 - int(self.from_position[1])
-    #         (x,y) = self.convert_to_screen_coordinates(col, row)
-    #         self.screen.blit(self.highlight_block, (x,y))
-        
-    #     # iterate over board squares (rows,columns) and convert coordinates
-
+            
     def parse_fen(self):
         return fenparser.FenParser(self.board.fen()).parse()
 
