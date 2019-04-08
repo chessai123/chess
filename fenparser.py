@@ -6,6 +6,7 @@ class FenParser():
     self.fen_str = fen_str
 
   def parse(self):
+    
     ranks = self.fen_str.split(" ")[0].split("/")
     pieces_on_all_ranks = [self.parse_rank(rank) for rank in ranks]
     return pieces_on_all_ranks

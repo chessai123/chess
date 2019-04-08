@@ -2,7 +2,7 @@ import pygame
 import sys
 import chess
 import math
-import fenparser as fp
+import fenparser
 
 screenW=400
 screenH=400
@@ -75,9 +75,8 @@ class chessb:
         x = row * (screenH/board_size)
         y = column * (screenW/board_size)
         return (x, y)
-    
+
     def draw_board(self):
-        # draw the squares on the board 8*8
         self.screen.fill(black)
         current_square = 0
         for i in range(board_size):
@@ -90,39 +89,35 @@ class chessb:
                 current_square += 1
             current_square += 1
         
-    def draw(self):
-        self.draw_board()
+    # def draw(self):
+    #     self.draw_board()
         
-        # parse and filter the piece string
-        fen = self.board.fen().split(" ", 1)
-        fen = fen[0].split("/", 8)
+    #     # parse and filter the piece string
+    #     fen = self.board.fen().split(" ", 1)
+    #     fen = fen[0].split("/", 8)
         
-        # find from pos - to pos
-        if self.from_position:
-            col = 1
-            for i in column_letter:
-                if i == self.from_position[0]:
-                    break
-                col += 1
-            row = 7 - int(self.from_position[1])
-            (x,y) = self.convert_to_screen_coordinates(col, row)
-            self.screen.blit(self.highlight_block, (x,y))
+    #     # find from pos - to pos
+    #     if self.from_position:
+    #         col = 1
+    #         for i in column_letter:
+    #             if i == self.from_position[0]:
+    #                 break
+    #             col += 1
+    #         row = 7 - int(self.from_position[1])
+    #         (x,y) = self.convert_to_screen_coordinates(col, row)
+    #         self.screen.blit(self.highlight_block, (x,y))
         
-        # iterate over board squares (rows,columns) and convert coordinates
+    #     # iterate over board squares (rows,columns) and convert coordinates
+
+    def parse_fen(self):
+        return fenparser.FenParser(self.board.fen()).parse()
+
+    def draw_pieces(self, fen):
         current_square = 0
         for i in range(board_size):
-            print(fen[i])
             for j in range(board_size):
                 (x, y) = self.convert_to_screen_coordinates(i, j)
-                print(j)
-                if j >= board_size:
-                    break
-
-                # stop if board array is out of range
-                if fen[i][j] == "8":
-                    break
-                
-                # draw piece according to piece board pos 
+                                
                 if fen[i][j] == "p":
                     self.screen.blit(self.black_pawn, (x,y))
                 if fen[i][j] == "P":
@@ -147,14 +142,16 @@ class chessb:
                     self.screen.blit(self.black_bishop, (x,y))
                 if fen[i][j] == "B":
                     self.screen.blit(self.white_bishop, (x,y))
-                
-                
-                if type(fen[i][j]) == type(4):
-                    print("type check")
-                    j += int(fen[i][j])
-                else:
-                    current_square += 1
+
+                current_square += 1
             current_square += 1
+
+    def draw(self):
+        self.draw_board()
+        fen = self.parse_fen()
+                
+        self.draw_pieces(fen)
+        
         pygame.display.update()
 
     def update(self):
@@ -168,47 +165,47 @@ class chessb:
         return pos
 
     def is_legal_move(self, move):
-        #print(self.board.legal_moves)
         Nf3 = chess.Move.from_uci(move)
         if Nf3 in self.board.legal_moves:
             self.board.push(Nf3) 
-            print(self.board.fen())
             self.draw()
         else:
             return False
             
+    def event_handler(self):
+        pass
+
     def game_loop(self):
+        pygame.event.set_blocked(pygame.MOUSEMOTION)
         self.draw()
         while True:            
             for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONUP:
-                    self.draw()
-                    if event.button == 1:
-                        #button_states = pygame.mouse.get_pressed()            
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    #left click
+                    if event.button == 1:          
                         pos = pygame.mouse.get_pos()
-                        # checks from and to pos & checks for legality of said pos/move
+                        
+                         # checks from and to pos & checks for legality of said pos/move
                         if self.from_position != None and self.to_position == None:
-                            #print("second check")
+                        
                             board_pos = self.convert_to_board_pos(pos[0], pos[1])
                             self.to_position = board_pos
                             move = self.from_position + self.to_position
-                            print(move)
                             status = self.is_legal_move(move)
                             if status == False:
                                 print("not a legal move")
-                            
+
                             self.from_position = None
                             self.to_position = None
 
                         # maps from pos
                         if self.from_position == None:
                             board_pos = self.convert_to_board_pos(pos[0], pos[1])
-                            print(board_pos)
                             self.from_position = board_pos
-                            pos = None
-
-            if event.type == pygame.QUIT:
-                sys.exit()
+               
+                if event.type == pygame.QUIT:
+                    sys.exit()
+            self.draw()
         
 if __name__ == "__main__":
     board = chessb()
