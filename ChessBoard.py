@@ -29,7 +29,6 @@ white_queen_img     = "images/Chess_tile_ql.png"
 black_tower_img     = "images/Chess_tile_rd.png"
 white_tower_imp     = "images/Chess_tile_rl.png"
 
-
 class chessb:
     def __init__(self):
         pygame.init()
@@ -91,7 +90,6 @@ class chessb:
                 current_square += 1
             current_square += 1
         
-
     def draw(self):
         self.draw_board()
         
@@ -179,7 +177,6 @@ class chessb:
         else:
             return False
             
-
     def game_loop(self):
         self.draw()
         while True:            
@@ -210,7 +207,6 @@ class chessb:
                             self.from_position = board_pos
                             pos = None
 
-                    
             if event.type == pygame.QUIT:
                 sys.exit()
         
