@@ -88,7 +88,7 @@ class chessb:
                     self.screen.blit(self.white_block, (x,y))
                 current_square += 1
             current_square += 1
-            
+
     def parse_fen(self):
         return fenparser.FenParser(self.board.fen()).parse()
 
@@ -249,11 +249,10 @@ class chessb:
         while True:            
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    #left click
                     if event.button == 1:          
                         pos = pygame.mouse.get_pos()
-                        
-                         # checks from and to pos & checks for legality of said pos/move
+
+                        # checks from and to pos & checks for legality of said pos/move
                         if self.from_position != None and self.to_position == None:
                         
                             board_pos = self.convert_to_board_pos(pos[0], pos[1])

@@ -1,11 +1,9 @@
 import chess
-import board
-import rules
 import math
 
 class Search():
     
-    def minmax(curdepth, board,  )
+    def minmax(curdepth, ,  )
         if curdepth == targetdepth:
             return eval[value]
         
