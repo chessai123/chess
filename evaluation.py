@@ -1,2 +1,1 @@
-import board
 import chess
