@@ -12,7 +12,8 @@ black = (0,0,0)
 board_size = 8
 column_letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 square_size = 50
-brown_square_img    = "images/brown_square.png"
+
+rown_square_img    = "images/brown_square.png"
 white_square_img    = "images/white_square.png"
 cyanid_square_img   = "images/cyan_square.png"
 
@@ -134,11 +135,8 @@ class chessb:
         
         pygame.display.update()
 
-    def update(self):
-        pass
-
     def convert_to_board_pos(self, x, y):
-        row = 8 - math.floor(y/square_size) 
+        row = board_size - math.floor(y/square_size) 
         column = math.floor(x/square_size)
         column = column_letter[column]
         pos = column + str(row)
@@ -152,9 +150,6 @@ class chessb:
         else:
             return False
             
-    def event_handler(self):
-        pass
-
     def game_loop(self):
         pygame.event.set_blocked(pygame.MOUSEMOTION)
         self.draw()
@@ -172,6 +167,7 @@ class chessb:
                             move = self.from_position + self.to_position
                             status = self.is_legal_move(move)
                             if status == False:
+                                if 
                                 print("not a legal move")
 
                             self.from_position = None
