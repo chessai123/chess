@@ -97,7 +97,7 @@ class chessb:
         for i in range(board_size):
             for j in range(board_size):
                 (x, y) = self.convert_to_screen_coordinates(i, j)
-                                
+                
                 if fen[i][j] == "p":
                     self.screen.blit(self.black_pawn, (x,y))
                 if fen[i][j] == "P":
@@ -144,8 +144,96 @@ class chessb:
         pos = column + str(row)
         return pos
 
+    def convert_to_chess_board_pos(self, x, y):
+        col = 0
+        for i in column_letter:
+            if i == x:
+                break
+            col += 1
+        row = board_size - int(y)
+        return (col, row)
+
+    def convert_to_chess_squares(self, x, y):
+        counter = 0
+        for i in range(1, board_size):
+            for j in range(1, board_size):
+                if (i, j) == (y, x):
+                    print("counter:")
+                    print(counter, ((x+1)*(y+1))-1)
+                    return counter
+                counter += 1
+        return counter        
+
+    def is_pawn_promotion(self, move):
+        first_pos = move[:2]
+        second_pos = move[2:]
+        fen = self.parse_fen()
+
+        first = self.convert_to_chess_board_pos(first_pos[0], first_pos[1]) 
+        first_col = first[0]
+        first_row = first[1]
+
+        second = self.convert_to_chess_board_pos(second_pos[0], second_pos[1])
+        second_col = second[0]
+        second_row = second[1]
+
+        print(first_pos, first_col, first_row)
+        #white pawn
+        if fen[first_row][first_col] == "P" and second_row == 0:
+            from_pos = self.convert_to_chess_squares(first_row, first_col)
+            to_pos = self.convert_to_chess_squares(second_row, second_col)
+            print("hello", from_pos, to_pos)
+            Nf3 = chess.Move(from_square=from_pos, to_square=to_pos, promotion=chess.QUEEN)
+            self.board.push(Nf3) 
+            self.draw()
+
+        #black pawn
+        if fen[first_row][first_col] == "p" and second_row == 7:
+            from_pos = self.convert_to_chess_squares(first_col, first_row)
+            to_pos = self.convert_to_chess_squares(second_col, second_row)
+            Nf3 = chess.Move(from_square=from_pos, to_square=to_pos, promotion=chess.QUEEN)
+            self.board.push(Nf3) 
+            self.draw()
+
+        """
+        fen = self.parse_fen()
+        pos = move[0]
+        first_col = 0
+        for i in column_letter:
+            if i == pos:
+                break
+            first_col += 1
+        first_row = int(move[1]) -1
+
+        pos = move[2]
+        to_col = 0
+        for i in column_letter:
+            if i == pos:
+                break
+            to_col += 1
+        to_row = int(move[3]) -1
+
+        print(move)
+
+        if fen[first_row][first_col] == "P" and move[3] == "8":
+            board_pos_from = self.convert_to_chess(first_col, first_row)
+            board_pos_to = self.convert_to_chess(to_col, to_row)
+            Nf3 = chess.Move(to_square=board_pos_from, from_square=board_pos_to, promotion=chess.QUEEN)
+            print(Nf3)
+            self.board.push(Nf3)
+            self.draw()
+        elif fen[first_row][first_col] and move[3] == "1":
+            board_pos_from = self.convert_to_chess(first_col, first_row)
+            board_pos_to = self.convert_to_chess(to_col, to_row)
+            Nf3 = chess.Move(from_square=board_pos_from, to_square=board_pos_to, promotion=chess.QUEEN)
+            self.board.push(Nf3)
+            self.draw()
+            """
+            
+
     def is_legal_move(self, move):
         Nf3 = chess.Move.from_uci(move)
+        self.is_pawn_promotion(move)
         if Nf3 in self.board.legal_moves:
             self.board.push(Nf3) 
             self.draw()
