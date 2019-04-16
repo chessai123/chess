@@ -14,7 +14,7 @@ board_length = math.sqrt(board_size)
 column_letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 square_size = 50
 
-rown_square_img    = "images/brown_square.png"
+brown_square_img    = "images/brown_square.png"
 white_square_img    = "images/white_square.png"
 cyanid_square_img   = "images/cyan_square.png"
 
@@ -74,9 +74,10 @@ class chessb:
         self.white_tower = pygame.transform.scale(self.white_tower, (square_size,square_size)) 
 
     def convert_to_chess_square(self, x, y):
-        row = 8 - math.floor(y/square_size) 
-        col = math.floor(x/square_size) + 1
-        return (row * col)-1
+        row = 7 - int(math.floor(y/square_size)) 
+        col = int(math.floor(x/square_size) + 1)
+        print(row, col)
+        return int(((row*board_length) + col)-1)
     
     def convert_to_screen_coordinates(self, row, column):
         x = row * (screenH/board_length)
@@ -130,147 +131,45 @@ class chessb:
         self.draw_pieces(fen)
         pygame.display.update()
 
-<<<<<<< HEAD
     def parse_fen(self):
         return fenparser.FenParser(self.board.fen()).parse()
 
-    def run_game(self):
-=======
-    def convert_to_board_pos(self, x, y):
-        row = board_size - math.floor(y/square_size) 
-        column = math.floor(x/square_size)
-        column = column_letter[column]
-        pos = column + str(row)
-        return pos
-
-    def convert_to_chess_board_pos(self, x, y):
-        col = 0
-        for i in column_letter:
-            if i == x:
-                break
-            col += 1
-        row = board_size - int(y)
-        return (col, row)
-
-    def convert_to_chess_squares(self, x, y):
-        counter = 0
-        for i in range(1, board_size):
-            for j in range(1, board_size):
-                if (i, j) == (y, x):
-                    print("counter:")
-                    print(counter, ((x+1)*(y+1))-1)
-                    return counter
-                counter += 1
-        return counter        
-
-    def is_pawn_promotion(self, move):
-        first_pos = move[:2]
-        second_pos = move[2:]
-        fen = self.parse_fen()
-
-        first = self.convert_to_chess_board_pos(first_pos[0], first_pos[1]) 
-        first_col = first[0]
-        first_row = first[1]
-
-        second = self.convert_to_chess_board_pos(second_pos[0], second_pos[1])
-        second_col = second[0]
-        second_row = second[1]
-
-        print(first_pos, first_col, first_row)
-        #white pawn
-        if fen[first_row][first_col] == "P" and second_row == 0:
-            from_pos = self.convert_to_chess_squares(first_row, first_col)
-            to_pos = self.convert_to_chess_squares(second_row, second_col)
-            print("hello", from_pos, to_pos)
-            Nf3 = chess.Move(from_square=from_pos, to_square=to_pos, promotion=chess.QUEEN)
-            self.board.push(Nf3) 
-            self.draw()
-
-        #black pawn
-        if fen[first_row][first_col] == "p" and second_row == 7:
-            from_pos = self.convert_to_chess_squares(first_col, first_row)
-            to_pos = self.convert_to_chess_squares(second_col, second_row)
-            Nf3 = chess.Move(from_square=from_pos, to_square=to_pos, promotion=chess.QUEEN)
-            self.board.push(Nf3) 
-            self.draw()
-
-        """
-        fen = self.parse_fen()
-        pos = move[0]
-        first_col = 0
-        for i in column_letter:
-            if i == pos:
-                break
-            first_col += 1
-        first_row = int(move[1]) -1
-
-        pos = move[2]
-        to_col = 0
-        for i in column_letter:
-            if i == pos:
-                break
-            to_col += 1
-        to_row = int(move[3]) -1
-
-        print(move)
-
-        if fen[first_row][first_col] == "P" and move[3] == "8":
-            board_pos_from = self.convert_to_chess(first_col, first_row)
-            board_pos_to = self.convert_to_chess(to_col, to_row)
-            Nf3 = chess.Move(to_square=board_pos_from, from_square=board_pos_to, promotion=chess.QUEEN)
-            print(Nf3)
-            self.board.push(Nf3)
-            self.draw()
-        elif fen[first_row][first_col] and move[3] == "1":
-            board_pos_from = self.convert_to_chess(first_col, first_row)
-            board_pos_to = self.convert_to_chess(to_col, to_row)
-            Nf3 = chess.Move(from_square=board_pos_from, to_square=board_pos_to, promotion=chess.QUEEN)
-            self.board.push(Nf3)
-            self.draw()
-            """
-            
-
-    def is_legal_move(self, move):
-        Nf3 = chess.Move.from_uci(move)
-        self.is_pawn_promotion(move)
+    def check_if_legal(self):
+        Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position)
+        print(Nf3)
         if Nf3 in self.board.legal_moves:
+            print("legal")
             self.board.push(Nf3) 
-            self.draw()
         else:
+            print("not a legal")
             return False
-            
-    def game_loop(self):
->>>>>>> 4e660bf778b7391410c93b736e35a1dbbf0fd81d
+
+    def move_piece(self, square):
+        if self.to_position == None and self.from_position != None:
+            self.to_position = square
+            #do the move
+            self.check_if_legal()
+            print("to position: {0} from position: {1}".format(self.to_position, self.from_position))
+            self.from_position = None
+            self.to_position = None
+            return
+        if self.from_position == None:
+            self.from_position = square
+            return
+
+    def run_game(self):
         pygame.event.set_blocked(pygame.MOUSEMOTION)
         self.draw()
         while True:
-            self.draw()
+            
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    
                     if event.button == 1:          
                         pos = pygame.mouse.get_pos()
                         square = self.convert_to_chess_square(pos[0], pos[1])
                         print(square)
-                        if self.to_position == None:
-                            pass
-
-<<<<<<< HEAD
-=======
-                        # checks from and to pos & checks for legality of said pos/move
-                        if self.from_position != None and self.to_position == None:
-                        
-                            board_pos = self.convert_to_board_pos(pos[0], pos[1])
-                            self.to_position = board_pos
-                            move = self.from_position + self.to_position
-                            status = self.is_legal_move(move)
-                            if status == False:
-                                if 
-                                print("not a legal move")
->>>>>>> 4e660bf778b7391410c93b736e35a1dbbf0fd81d
-
-                            if self.from_position == None:
-                                pass
+                        self.move_piece(square)
+                        self.draw()
                 if event.type == pygame.QUIT:
                     sys.exit()
 
