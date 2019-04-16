@@ -11,9 +11,9 @@ clock = pygame.time.Clock()
 black = (0,0,0)
 board_size = 8
 column_letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-square_size = 50
+square_size = int(screenH / 8)
 
-rown_square_img    = "images/brown_square.png"
+brown_square_img    = "images/brown_square.png"
 white_square_img    = "images/white_square.png"
 cyanid_square_img   = "images/cyan_square.png"
 
@@ -153,16 +153,17 @@ class chessb:
 
     def convert_to_chess_squares(self, x, y):
         counter = 0
-        for i in range(1, board_size):
-            for j in range(1, board_size):
+        for i in range(board_size):
+            for j in range(board_size):
                 if (i, j) == (y, x):
-                    print("counter:")
-                    print(counter, ((x+1)*(y+1))-1)
+                    #print("counter:")
+                    print("counter" ,counter, ((x+1)*(y+1))-1)
                     return counter
                 counter += 1
         return counter        
 
     def is_pawn_promotion(self, move):
+        print(move)
         first_pos = move[:2]
         second_pos = move[2:]
         fen = self.parse_fen()
@@ -175,17 +176,18 @@ class chessb:
         second_col = second[0]
         second_row = second[1]
 
-        print(first_pos, first_col, first_row)
-        #white pawn
+        # check for white pawn
         if fen[first_row][first_col] == "P" and second_row == 0:
             from_pos = self.convert_to_chess_squares(first_row, first_col)
             to_pos = self.convert_to_chess_squares(second_row, second_col)
+            print(first_pos, first_col, first_row)
+            print("\n")
             print("hello", from_pos, to_pos)
             Nf3 = chess.Move(from_square=from_pos, to_square=to_pos, promotion=chess.QUEEN)
             self.board.push(Nf3) 
             self.draw()
 
-        #black pawn
+        # check for black pawn
         if fen[first_row][first_col] == "p" and second_row == 7:
             from_pos = self.convert_to_chess_squares(first_col, first_row)
             to_pos = self.convert_to_chess_squares(second_col, second_row)
@@ -255,7 +257,6 @@ class chessb:
                             move = self.from_position + self.to_position
                             status = self.is_legal_move(move)
                             if status == False:
-                                if 
                                 print("not a legal move")
 
                             self.from_position = None
