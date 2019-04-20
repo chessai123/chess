@@ -60,9 +60,8 @@ class chessb:
 
     def convert_to_chess_square(self, x, y):
         row = 7 - int(math.floor(y/square_size)) 
-        col = int(math.floor(x/square_size) + 1)
-        print(row, col)
-        return int(((row*board_length) + col)-1)
+        col = int(math.floor(x/square_size))
+        return chess.square(col, row) 
     
     def convert_to_screen_coordinates(self, row, column):
         x = row * (screenH/board_length)
@@ -119,9 +118,29 @@ class chessb:
     def parse_fen(self):
         return fenparser.FenParser(self.board.fen()).parse()
 
+    def find_column(self, pos):
+        return chess.square_file(self.from_position)
+
+    def find_row(self, pos):
+        return chess.square_rank(self.from_position)
+
+    def check_if_promotion(self):
+        row = 7 - self.find_row(self.from_position)
+        col = self.find_column(self.from_position)
+        fen = self.parse_fen()
+        if row == 1 and fen[row][col] == "P":
+            return True
+        elif row == 6 and fen[row][col] == "p":
+            return True
+        else: 
+            return False
+
     def check_if_legal(self):
-        Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position)
-        print(Nf3)
+        if self.check_if_promotion():
+            Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position, promotion=chess.QUEEN)#queen
+        else:    
+            Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position)
+        
         if Nf3 in self.board.legal_moves:
             print("legal")
             self.board.push(Nf3) 
@@ -134,7 +153,6 @@ class chessb:
             self.to_position = square
             #do the move
             self.check_if_legal()
-            print("to position: {0} from position: {1}".format(self.to_position, self.from_position))
             self.from_position = None
             self.to_position = None
             return
@@ -152,7 +170,6 @@ class chessb:
                     if event.button == 1:          
                         pos = pygame.mouse.get_pos()
                         square = self.convert_to_chess_square(pos[0], pos[1])
-                        print(square)
                         self.move_piece(square)
                         self.draw()
                 if event.type == pygame.QUIT:
