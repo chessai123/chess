@@ -4,6 +4,7 @@ import chess
 import math
 import fenparser
 import config as cfg
+import evaluation
 
 screenW=400
 screenH=400
@@ -12,8 +13,6 @@ clock = pygame.time.Clock()
 black = (0,0,0)
 board_size = 64
 board_length = math.sqrt(board_size)
-# button_size =  
-column_letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 square_size = int(screenH / 8)
 
 
@@ -28,6 +27,7 @@ class chessb:
         self.button = pygame.Rect(100, 100, 50, 50)
         self.from_position = None
         self.to_position = None
+        self.turn = 0
 
     def LoadImages(self):
         self.white_block = pygame.image.load(cfg.white_square_img)
@@ -118,7 +118,7 @@ class chessb:
         self.draw_board_squares()
         fen = self.parse_fen()
         self.draw_pieces(fen)
-        self.draw_button()
+        #self.draw_button()
         pygame.display.update()
 
     def parse_fen(self):
@@ -137,10 +137,10 @@ class chessb:
             print(self.board.result())
             sys.exit()
             
-    def restart_game(self):
-        self.board.clear()
-        self.board = chess.Board()
-        self.draw()
+    # def restart_game(self):
+    #     self.board.clear()
+    #     self.board = chess.Board()
+    #     self.draw()
 
     def check_if_promotion(self):
         row = 7 - self.find_row(self.from_position)
@@ -162,6 +162,7 @@ class chessb:
         if Nf3 in self.board.legal_moves:
             print("legal")
             self.board.push(Nf3)
+            self.turn += 1
             self.status()
         else:
             print("not a legal")
@@ -179,24 +180,36 @@ class chessb:
             self.from_position = square
             return
 
-    def run_game(self):
-        pygame.event.set_blocked(pygame.MOUSEMOTION)
-        self.draw()
-        while True:
-            
-            for event in pygame.event.get():
+    def player_move(self):
+        
+        for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         pos = pygame.mouse.get_pos()
                         square = self.convert_to_chess_square(pos[0], pos[1])
                         self.move_piece(square)
                         self.draw()
-                    if self.button.collidepoint(pos):
-                        self.restart_game()
-                    
-                if event.type == pygame.QUIT:
-                    sys.exit()
+
+                    if event.type == pygame.QUIT:
+                        sys.exit()
+
+    def run_game(self):
+        pygame.event.set_blocked(pygame.MOUSEMOTION)
+        self.draw()
+        
+        while True:
+            if self.turn%2 == 0:
+                self.player_move()
+            else:
+                #AI
+                self.board = AI.make_move(self.board) 
+                self.turn += 1
+                self.draw()
+                    #if self.button.collidepoint(pos):
+                    #    self.restart_game()
+                
 
 if __name__ == "__main__":
     ChessGame = chessb()
+    AI = evaluation.AI()
     ChessGame.run_game()
