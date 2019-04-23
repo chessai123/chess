@@ -12,6 +12,7 @@ clock = pygame.time.Clock()
 black = (0,0,0)
 board_size = 64
 board_length = math.sqrt(board_size)
+# button_size =  
 column_letter = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 square_size = int(screenH / 8)
 
@@ -24,6 +25,7 @@ class chessb:
         pygame.display.set_caption('AlfaGeir')
         self.LoadImages()
         self.board = chess.Board()
+        self.button = pygame.Rect(100, 100, 50, 50)
         self.from_position = None
         self.to_position = None
 
@@ -68,6 +70,9 @@ class chessb:
         y = column * (screenW/board_length)
         return (x, y)
 
+    def draw_button(self):
+        pygame.draw.rect(self.screen, [255, 0, 0], self.button)
+    
     def draw_board_squares(self):
         self.screen.fill(black)
         for i in range(board_size):
@@ -113,6 +118,7 @@ class chessb:
         self.draw_board_squares()
         fen = self.parse_fen()
         self.draw_pieces(fen)
+        self.draw_button()
         pygame.display.update()
 
     def parse_fen(self):
@@ -123,6 +129,18 @@ class chessb:
 
     def find_row(self, pos):
         return chess.square_rank(self.from_position)
+    
+    def status(self):
+        # check for game conditions and return the result
+        if self.board.is_game_over() == True:
+            print("Game Over")
+            print(self.board.result())
+            sys.exit()
+            
+    def restart_game(self):
+        self.board.clear()
+        self.board = chess.Board()
+        self.draw()
 
     def check_if_promotion(self):
         row = 7 - self.find_row(self.from_position)
@@ -137,13 +155,14 @@ class chessb:
 
     def check_if_legal(self):
         if self.check_if_promotion():
-            Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position, promotion=chess.QUEEN)#queen
+            Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position, promotion=chess.QUEEN)
         else:    
             Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position)
         
         if Nf3 in self.board.legal_moves:
             print("legal")
-            self.board.push(Nf3) 
+            self.board.push(Nf3)
+            self.status()
         else:
             print("not a legal")
             return False
@@ -167,11 +186,14 @@ class chessb:
             
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:          
+                    if event.button == 1:
                         pos = pygame.mouse.get_pos()
                         square = self.convert_to_chess_square(pos[0], pos[1])
                         self.move_piece(square)
                         self.draw()
+                    if self.button.collidepoint(pos):
+                        self.restart_game()
+                    
                 if event.type == pygame.QUIT:
                     sys.exit()
 
