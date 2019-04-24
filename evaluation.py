@@ -12,7 +12,7 @@ class AI():
         print(legal_move_list[0])
         return board
 
-    def get_row_and_col(self, string)       
+    def get_row_and_col(self, string):  
         col1 = 0
         for i in letters:
             if i == string[0]:
