@@ -15,6 +15,8 @@ white_queen_img = "images/Chess_tile_ql.png"
 black_tower_img = "images/Chess_tile_rd.png"
 white_tower_imp = "images/Chess_tile_rl.png"
 
+board_length = 8
+
 piece = { 'P': 100, 'N': 280, 'B': 320, 'R': 479, 'Q': 929, 'K': 60000 }
 pst = {
     'P': (   0,   0,   0,   0,   0,   0,   0,   0,
