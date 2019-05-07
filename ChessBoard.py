@@ -202,7 +202,7 @@ class chessb:
                 self.player_move()
             else:
                 #AI
-                self.board = AI.make_move(self.board) 
+                self.board = evaluation.make_move(self.board) 
                 self.turn += 1
                 self.draw()
                     #if self.button.collidepoint(pos):
@@ -211,5 +211,4 @@ class chessb:
 
 if __name__ == "__main__":
     ChessGame = chessb()
-    AI = evaluation.AI()
     ChessGame.run_game()
