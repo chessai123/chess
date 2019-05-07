@@ -8,7 +8,6 @@ import evaluation as eval
 
 screenW=400
 screenH=400
-clock = pygame.time.Clock()
 
 black = (0,0,0)
 board_size = 64
@@ -24,7 +23,7 @@ class chessb:
         pygame.display.set_caption('AlfaGeir')
         self.LoadImages()
         self.board = chess.Board()
-        self.button = pygame.Rect(100, 100, 50, 50)
+        #self.button = pygame.Rect(100, 100, 50, 50)
         self.from_position = None
         self.to_position = None
         self.turn = 0
@@ -211,12 +210,11 @@ class chessb:
                 self.player_move()
             else:
                 #AI
-                self.board = AI.make_move(self.board) 
+                self.board = eval.make_move(self.board) 
                 self.turn += 1
                 self.draw()
                     
                 
 if __name__ == "__main__":
     ChessGame = chessb()
-    AI = eval.AI()
     ChessGame.run_game()
