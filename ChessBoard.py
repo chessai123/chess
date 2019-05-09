@@ -4,11 +4,10 @@ import chess
 import math
 import fenparser
 import config as cfg
-import evaluation
+import evaluation as eval
 
 screenW=400
 screenH=400
-clock = pygame.time.Clock()
 
 black = (0,0,0)
 board_size = 64
@@ -24,7 +23,7 @@ class chessb:
         pygame.display.set_caption('AlfaGeir')
         self.LoadImages()
         self.board = chess.Board()
-        self.button = pygame.Rect(100, 100, 50, 50)
+        #self.button = pygame.Rect(100, 100, 50, 50)
         self.from_position = None
         self.to_position = None
         self.turn = 0
@@ -131,14 +130,19 @@ class chessb:
         return chess.square_rank(self.from_position)
     
     def status(self):
-        # check for game conditions and return the result
         if self.board.is_game_over() == True:
             print("Game Over")
             print(self.board.result())
+            if self.board.result() == "1-0":
+                print("White Won")
+            elif self.board.result() == "0-1":
+                print("Black Won")
+            else:
+                print("Game is drawn")
+
             sys.exit()
-            
-    # def restart_game(self):
-    #     self.board.clear()
+    
+    #def restart_game(self):
     #     self.board = chess.Board()
     #     self.draw()
 
@@ -146,6 +150,7 @@ class chessb:
         row = 7 - self.find_row(self.from_position)
         col = self.find_column(self.from_position)
         fen = self.parse_fen()
+        
         if row == 1 and fen[row][col] == "P":
             return True
         elif row == 6 and fen[row][col] == "p":
@@ -165,7 +170,7 @@ class chessb:
             self.turn += 1
             self.status()
         else:
-            print("not a legal")
+            print("not legal")
             return False
 
     def move_piece(self, square):
@@ -190,6 +195,9 @@ class chessb:
                         self.move_piece(square)
                         self.draw()
 
+                    #if self.button.collidepoint(pos):
+                    #    self.restart_game()
+
                     if event.type == pygame.QUIT:
                         sys.exit()
 
@@ -198,17 +206,15 @@ class chessb:
         self.draw()
         
         while True:
-            if self.turn%2 == 0:
+            if self.turn % 2 == 0:
                 self.player_move()
             else:
                 #AI
-                self.board = evaluation.make_move(self.board) 
+                self.board = eval.make_move(self.board) 
                 self.turn += 1
                 self.draw()
-                    #if self.button.collidepoint(pos):
-                    #    self.restart_game()
+                    
                 
-
 if __name__ == "__main__":
     ChessGame = chessb()
     ChessGame.run_game()
