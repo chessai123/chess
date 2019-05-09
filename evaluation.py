@@ -9,8 +9,8 @@ letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
 def make_move(board):
     tree = Node(2, 1, 0, board)
-    move = min_max(2, tree, 1)
-    print(move)
+    move = min_max(2, tree, 1, -sys.maxsize, sys.maxsize)
+    #print(move)
     # legal_move_list = [x for x in board.legal_moves]
     board.push(move[1])
     return board
@@ -90,43 +90,81 @@ class Node(object):
         legal_moves = [x for x in self.board.legal_moves]
         if self.depth >= 0:
             for x in legal_moves:
+                
                 self.board.push(x)
                 self.children.append(Node(self.depth-1, -self.playernum, x, self.board))
                 self.board.pop()
 
 
-def min_max(depth, node, player):
+def min_max(depth, node, player, alpha, beta):
     if player > 0:
-        max_score = [-sys.maxsize, None]
+        max_score = [alpha, None]
     else:
-        max_score = [sys.maxsize, None]
+        max_score = [beta, None]
 
+      
     if depth == 0:
         node.board.push(node.move)
         score = evaluate_board_score(node.board)
         node.board.pop()
-        #print("score: {}, node move: {}, board: {}, depth: {}".format(score, node.move, node.board, node.depth))
         return [score, node.move]
 
-    for child in node.children:
-        child.board.push(child.move)
-        evaluation = min_max(depth-1, child, -player)
-        child.board.pop()
 
-        #print(evaluation, max_score)
-        if (player > 0):
+    child_num = 0
+    if player > 0:
+        for child in node.children:
+            child_num += 1
+
+            print("This is child number: {}, at depth: {}, and the move: {}".format(child_num, depth, node.move))
+            child.board.push(child.move)
+            evaluation = min_max(depth-1, child, -player, alpha, beta)
+            child.board.pop()
+
             if(evaluation[0] > max_score[0]):
                 if(node.move != 0):
                     max_score = [evaluation[0], node.move]
                 else:
                     max_score = [evaluation[0], evaluation[1]]
-        else:
+
+            alpha = max(max_score[0], alpha)
+
+            if beta <= alpha:
+                break
+    else: 
+        for child in node.children:
+            print("This is child number: {}, at depth: {}, and the move: {}".format(child_num, depth, node.move))
+            child.board.push(child.move)
+            evaluation = min_max(depth-1, child, -player, alpha, beta)
+            child.board.pop()
+
             if(evaluation[0] < max_score[0]):
                 if(node.move != 0):
                     max_score = [evaluation[0], node.move]
                 else:
                     max_score = [evaluation[0], evaluation[1]]
+            
+            beta = min(max_score[0], beta)
+            
+            if beta <= alpha:
+                break
+    print("at depth: {} this is the max_score: {}".format(depth, max_score)) 
     return max_score
+
+
+    #     #print(evaluation, max_score)
+    #     if (player > 0):
+    #         if(evaluation[0] > max_score[0]):
+    #             if(node.move != 0):
+    #                 max_score = [evaluation[0], node.move]
+    #             else:
+    #                 max_score = [evaluation[0], evaluation[1]]
+    #     else:
+    #         if(evaluation[0] < max_score[0]):
+    #             if(node.move != 0):
+    #                 max_score = [evaluation[0], node.move]
+    #             else:
+    #                 max_score = [evaluation[0], evaluation[1]]
+    # return max_score
 
 def AI_make_move():
     pass

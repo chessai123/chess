@@ -6,8 +6,8 @@ import fenparser
 import config as cfg
 import evaluation as eval
 
-screenW=400
-screenH=400
+screenW=600
+screenH=600
 
 black = (0,0,0)
 board_size = 64
@@ -30,7 +30,11 @@ class chessb:
 
     def LoadImages(self):
         self.white_block = pygame.image.load(cfg.white_square_img)
+        self.white_block = pygame.transform.scale(self.white_block, (square_size,square_size))
+
         self.brown_block = pygame.image.load(cfg.brown_square_img)
+        self.brown_block = pygame.transform.scale(self.brown_block, (square_size,square_size))
+
         self.highlight_block = pygame.image.load(cfg.cyanid_square_img)
         self.highlight_block = pygame.transform.scale(self.highlight_block, (square_size,square_size))
 
@@ -78,7 +82,7 @@ class chessb:
             col = math.floor(i / board_length)
             row = (i % board_length)
             (x, y) = self.convert_to_screen_coordinates(row, col)   
-            if ((x+y)/square_size)%2 == 0: 
+            if ((x+y)/square_size)%2 == 1: 
                 self.screen.blit(self.brown_block, (x, y))
             else:
                 self.screen.blit(self.white_block, (x, y))
