@@ -28,7 +28,7 @@ def calculate_score_for_piece(piece, lowercase, row, col):
     else:
         piece_value = -config.piece[piece]
         pst_value = -position_scores[pst_pos]
-    print("piece value: {} position value: {}, sum: {}".format(piece_value, pst_value, piece_value+pst_value))
+    #print("piece value: {} position value: {}, sum: {}".format(piece_value, pst_value, piece_value+pst_value))
     return pst_value + piece_value
 
 
@@ -102,12 +102,18 @@ def min_max(depth, node, player):
         max_score = [sys.maxsize, None]
 
     if depth == 0:
+        node.board.push(node.move)
         score = evaluate_board_score(node.board)
+        node.board.pop()
+        #print("score: {}, node move: {}, board: {}, depth: {}".format(score, node.move, node.board, node.depth))
         return [score, node.move]
 
     for child in node.children:
+        child.board.push(child.move)
         evaluation = min_max(depth-1, child, -player)
-        print(evaluation, max_score)
+        child.board.pop()
+
+        #print(evaluation, max_score)
         if (player > 0):
             if(evaluation[0] > max_score[0]):
                 if(node.move != 0):
