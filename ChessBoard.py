@@ -6,14 +6,17 @@ import fenparser
 import config as cfg
 import evaluation as eval
 
-screenW=600
-screenH=600
+boardW = 600
+boardH = 600
+screenW = 800
+screenH = 600
 
 black = (0,0,0)
 board_size = 64
 board_length = math.sqrt(board_size)
 square_size = int(screenH / 8)
 
+button_size =  square_size
 
 class chessb:
     def __init__(self):
@@ -23,7 +26,6 @@ class chessb:
         pygame.display.set_caption('AlfaGeir')
         self.LoadImages()
         self.board = chess.Board()
-        #self.button = pygame.Rect(100, 100, 50, 50)
         self.from_position = None
         self.to_position = None
         self.turn = 0
@@ -37,6 +39,9 @@ class chessb:
 
         self.highlight_block = pygame.image.load(cfg.cyanid_square_img)
         self.highlight_block = pygame.transform.scale(self.highlight_block, (square_size,square_size))
+
+        self.restart_button = pygame.image.load(cfg.restart_button_img)
+        self.restart_button = pygame.transform.scale(self.restart_button, (button_size, button_size))
 
         self.black_pawn = pygame.image.load(cfg.black_pawn_img)
         self.black_pawn = pygame.transform.scale(self.black_pawn, (square_size,square_size))
@@ -73,16 +78,21 @@ class chessb:
         y = column * (screenW/board_length)
         return (x, y)
 
+    def convert_to_board_coordinates(self, row, column):
+        x = row * (boardH/board_length)
+        y = column * (boardW/board_length)
+        return (x, y)
+
     def draw_button(self):
-        pygame.draw.rect(self.screen, [255, 0, 0], self.button)
+        self.screen.blit(self.restart_button, (700, 200))
     
     def draw_board_squares(self):
         self.screen.fill(black)
         for i in range(board_size):
             col = math.floor(i / board_length)
             row = (i % board_length)
-            (x, y) = self.convert_to_screen_coordinates(row, col)   
-            if ((x+y)/square_size)%2 == 1: 
+            (x, y) = self.convert_to_board_coordinates(row, col)   
+            if ((x+y)/square_size) % 2 == 1: 
                 self.screen.blit(self.brown_block, (x, y))
             else:
                 self.screen.blit(self.white_block, (x, y))
@@ -91,7 +101,7 @@ class chessb:
         for i in range(board_size):
             col = int(math.floor(i / board_length))
             row = int(i % board_length)
-            (x, y) = self.convert_to_screen_coordinates(row, col)
+            (x, y) = self.convert_to_board_coordinates(row, col)
             if fen[col][row] == "p":
                 self.screen.blit(self.black_pawn, (x,y))
             if fen[col][row] == "P":
@@ -121,7 +131,7 @@ class chessb:
         self.draw_board_squares()
         fen = self.parse_fen()
         self.draw_pieces(fen)
-        #self.draw_button()
+        self.draw_button()
         pygame.display.update()
 
     def parse_fen(self):
@@ -146,9 +156,9 @@ class chessb:
 
             sys.exit()
     
-    #def restart_game(self):
-    #     self.board = chess.Board()
-    #     self.draw()
+    def restart_game(self):
+        self.board = chess.Board()
+        self.draw()
 
     def check_if_promotion(self):
         row = 7 - self.find_row(self.from_position)
@@ -180,28 +190,30 @@ class chessb:
     def move_piece(self, square):
         if self.to_position == None and self.from_position != None:
             self.to_position = square
-            #do the move
             self.check_if_legal()
+            
             self.from_position = None
             self.to_position = None
+            
             return
+
         if self.from_position == None:
             self.from_position = square
             return
 
     def player_move(self):
-        
         for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    
+                    if self.restart_button.collidepoint(pos):
+                        self.restart_game()
+                    
                     if event.button == 1:
                         pos = pygame.mouse.get_pos()
                         square = self.convert_to_chess_square(pos[0], pos[1])
                         self.move_piece(square)
                         self.draw()
-
-                    #if self.button.collidepoint(pos):
-                    #    self.restart_game()
-
+                    
                     if event.type == pygame.QUIT:
                         sys.exit()
 
@@ -213,11 +225,9 @@ class chessb:
             if self.turn % 2 == 0:
                 self.player_move()
             else:
-                #AI
                 self.board = eval.make_move(self.board) 
                 self.turn += 1
                 self.draw()
-                    
                 
 if __name__ == "__main__":
     ChessGame = chessb()

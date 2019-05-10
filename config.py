@@ -2,6 +2,8 @@ brown_square_img = "images/brown_square.png"
 white_square_img = "images/white_square.png"
 cyanid_square_img = "images/cyan_square.png"
 
+restart_button_img = "images/restart_button.png"
+
 black_pawn_img = "images/Chess_tile_pd.png"
 white_pawn_img = "images/Chess_tile_pl.png"
 black_bishop_img = "images/Chess_tile_bd.png"
