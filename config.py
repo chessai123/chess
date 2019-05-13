@@ -19,6 +19,10 @@ white_tower_imp = "images/Chess_tile_rl.png"
 
 board_length = 8
 
+"""    Each piece is represented by a static value
+and is also given a heuristic value according to the board position.
+Thereby these values will dictate the behavior of the chess bot.      """
+
 piece = { 'P': 100, 'N': 280, 'B': 320, 'R': 479, 'Q': 929, 'K': 60000 }
 pst = {
     'P': (   0,   0,   0,   0,   0,   0,   0,   0,

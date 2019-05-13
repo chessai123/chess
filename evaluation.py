@@ -6,14 +6,13 @@ import sys
 
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-
 def make_move(board):
     tree = Node(2, 1, 0, board)
     move = min_max(2, tree, 1, -sys.maxsize, sys.maxsize)
     board.push(move[1])
     return board
 
-
+""" Calculate the score for a piece depending on the color and position """
 def calculate_score_for_piece(piece, lowercase, row, col):
     piece = piece.upper()
     pst_pos = (config.board_length * row) + col
@@ -27,7 +26,6 @@ def calculate_score_for_piece(piece, lowercase, row, col):
         piece_value = -config.piece[piece]
         pst_value = -position_scores[pst_pos]
     return pst_value + piece_value
-
 
 def calculate_score_for_position(row, col, fen):
     piece = fen[row][col]
@@ -58,10 +56,8 @@ def calculate_score_for_position(row, col, fen):
         return calculate_score_for_piece(piece, True, row, col)
     else:
         return 0
-
-
+""" Calculate the score of the board by parsing the board state """
 def evaluate_board_score(board):
-    # loop through the board and calculate the score
     fen = parse_fen(board)
     score = 0
     for row in range(len(fen)):
@@ -71,7 +67,6 @@ def evaluate_board_score(board):
 
 def parse_fen(board):
     return fenparser.FenParser(board.fen()).parse()
-
 
 class Node(object):
     def __init__(self, depth, playernum, move, board):
@@ -90,8 +85,8 @@ class Node(object):
                 self.board.push(x)
                 self.children.append(Node(self.depth-1, -self.playernum, x, self.board))
                 self.board.pop()
-
-
+""" Recursively calculate max possible score for positions throughout the branches in the decision trees. 
+    Using Alpha-Beta pruning to reduce branch calculations """
 def min_max(depth, node, player, alpha, beta):
     if player > 0:
         max_score = [alpha, None]
@@ -136,5 +131,4 @@ def min_max(depth, node, player, alpha, beta):
             
             if beta <= alpha:
                 break
-    #print("at depth: {} this is the max_score: {}".format(depth, max_score)) 
     return max_score
