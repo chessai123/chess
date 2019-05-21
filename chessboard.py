@@ -193,7 +193,7 @@ class chessBoard:
             self.from_position = square
             return
 
-    """"Human player mouse events """
+    """" Player events """
     def player_move(self):
         for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -206,8 +206,23 @@ class chessBoard:
                     if event.type == pygame.QUIT:
                         sys.exit()
 
-    """" Main game loop """
-    def run_game(self):
+    """" AI vs AI game loop """
+    def run_game_AIvAI(self):
+        pygame.event.set_blocked(pygame.MOUSEMOTION)
+        self.draw()
+        
+        while True:
+            if self.turn % 2 == 0:
+                self.board = eval.make_move(self.board)
+                self.turn += 1
+                self.draw()
+            else:
+                self.board = eval.make_move(self.board) 
+                self.turn += 1
+                self.draw()
+
+    """" Player vs AI game loop """
+    def run_game_playerVsAI(self):
         pygame.event.set_blocked(pygame.MOUSEMOTION)
         self.draw()
         
@@ -218,7 +233,38 @@ class chessBoard:
                 self.board = eval.make_move(self.board) 
                 self.turn += 1
                 self.draw()
+    
+    def run_game_playerVsPlayer(self):
+        pygame.event.set_blocked(pygame.MOUSEMOTION)
+        self.draw()
+
+        while True:
+            if self.turn % 2 == 0:
+                self.player_move()
+            else:
+                self.player_move()
+
+    def cmd_choices(self):
+        while(1):
+            print('Welcome to AlfaGeir!')
+            print('To play vs the AI type "1"')
+            print('To see AI vs AI type "2"')
+            print('To play player vs player type "3"')
+            print('To exit type "exit" or "quit"')
+            user_input = input("> ")
+            command = user_input.split(' ', 1)
+            command[0].lower()
+
+            if (command[0] == "1"):
+                ChessGame.run_game_playerVsAI()
+            elif (command[0] == "2"):
+                ChessGame.run_game_AIvAI()
+            elif (command[0] == "3"):
+                ChessGame.run_game_playerVsPlayer()
+            elif (command[0] == "quit" or command[0] == "exit"):
+                break
+
                 
 if __name__ == "__main__":
     ChessGame = chessBoard()
-    ChessGame.run_game()
+    ChessGame.cmd_choices()

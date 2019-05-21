@@ -56,6 +56,7 @@ def calculate_score_for_position(row, col, fen):
         return calculate_score_for_piece(piece, True, row, col)
     else:
         return 0
+
 """ Calculate the score of the board by parsing the board state """
 def evaluate_board_score(board):
     fen = parse_fen(board)
@@ -81,11 +82,11 @@ class Node(object):
         legal_moves = [x for x in self.board.legal_moves]
         if self.depth >= 0:
             for x in legal_moves:
-                
                 self.board.push(x)
                 self.children.append(Node(self.depth-1, -self.playernum, x, self.board))
                 self.board.pop()
-""" Recursively calculate max possible score for positions throughout the branches in the decision trees. 
+
+""" Recursively calculate max possible score for positions throughout the branches in the decision tree. 
     Using Alpha-Beta pruning to reduce branch calculations """
 def min_max(depth, node, player, alpha, beta):
     if player > 0:
