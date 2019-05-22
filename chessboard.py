@@ -7,10 +7,10 @@ import config as cfg
 import evaluation as eval
 
 """ Change parameters to set resolution """
-boardW = 600
-boardH = 600
-screenW = 600
-screenH = 600
+boardW = 800
+boardH = 800
+screenW = 800
+screenH = 800
 
 black = (0,0,0)
 board_size = 64
@@ -82,8 +82,11 @@ class chessBoard:
         y = column * (boardW/board_length)
         return (x, y)
 
+    
+
     def draw_board_squares(self):
         self.screen.fill(black)
+
         for i in range(board_size):
             col = math.floor(i / board_length)
             row = (i % board_length)
@@ -92,6 +95,15 @@ class chessBoard:
                 self.screen.blit(self.brown_block, (x, y))
             else:
                 self.screen.blit(self.white_block, (x, y))
+           
+        if self.from_position:
+            row = self.find_row(self.from_position)
+            col = self.find_column(self.from_position)
+
+            (x, y) = self.convert_to_board_coordinates(col, row)
+            y = screenH - y - square_size 
+            self.screen.blit(self.highlight_block, (x, y))
+                
     
     """" Draws pieces to the screen/squares(columns and rows) according to the passed fen-string """
     def draw_pieces(self, fen):
@@ -153,6 +165,7 @@ class chessBoard:
 
             sys.exit()
 
+    # have to flip the row
     def check_if_promotion(self):
         row = 7 - self.find_row(self.from_position)
         col = self.find_column(self.from_position)
