@@ -21,8 +21,8 @@ class chessBoard:
     def __init__(self):
         pygame.init()
         pygame.display.init()
+        pygame.display.set_caption("AlfaGeir")
         self.screen = pygame.display.set_mode((screenW,screenH))
-        pygame.display.set_caption('AlfaGeir')
         self.LoadImages()
         self.board = chess.Board()
         self.from_position = None
@@ -224,13 +224,16 @@ class chessBoard:
     def run_game_AIvAI(self):
         pygame.event.set_blocked(pygame.MOUSEMOTION)
         self.draw()
-        
+        pygame.display.set_caption("AlfaGeir vs AlfaGeir")
+        self.screen = pygame.display.set_mode((screenW,screenH))
         while True:
             if self.turn % 2 == 0:
+                self.screen = pygame.display.set_mode((screenW,screenH))
                 self.board = evaluation.make_move(self.board)
                 self.turn += 1
                 self.draw()
-            else:
+            else: 
+                self.screen = pygame.display.set_mode((screenW,screenH))
                 self.board = evaluation.make_move(self.board) 
                 self.turn += 1
                 self.draw()
@@ -242,9 +245,13 @@ class chessBoard:
         
         while True:
             if self.turn % 2 == 0:
+                pygame.display.set_caption("AlfaGeir - White to move")
+                self.screen = pygame.display.set_mode((screenW,screenH))
                 self.player_move()
                 
             else:
+                pygame.display.set_caption("AlfaGeir - AI thinking...")
+                self.screen = pygame.display.set_mode((screenW,screenH))
                 self.board = evaluation.make_move(self.board) 
                 self.turn += 1
                 self.draw()
