@@ -4,7 +4,7 @@ import chess
 import math
 import fenparser
 import config as cfg
-import evaluation as eval
+import evaluation
 
 """ Change parameters to set resolution """
 boardW = 800
@@ -66,16 +66,11 @@ class chessBoard:
 
     """" Maps mouseclick to chessboard """
     def convert_to_chess_square(self, x, y):
+        #since the board is represented different from how it is drawn
+        #we need to flip the row to get the right row number. 
         row = 7 - int(math.floor(y/square_size)) 
         col = int(math.floor(x/square_size))
         return chess.square(col, row) 
-    
-    """" Get screen coordinates when clicking etc.  """
-    def convert_to_screen_coordinates(self, row, column):
-        x = row * (screenH/board_length)
-        y = column * (screenW/board_length)
-        return (x, y)
-
 
     def convert_to_board_coordinates(self, row, column):
         x = row * (boardH/board_length)
@@ -90,7 +85,8 @@ class chessBoard:
         for i in range(board_size):
             col = math.floor(i / board_length)
             row = (i % board_length)
-            (x, y) = self.convert_to_board_coordinates(row, col)   
+            (x, y) = self.convert_to_board_coordinates(row, col)  
+
             if ((x+y)/square_size) % 2 == 1: 
                 self.screen.blit(self.brown_block, (x, y))
             else:
@@ -101,6 +97,8 @@ class chessBoard:
             col = self.find_column(self.from_position)
 
             (x, y) = self.convert_to_board_coordinates(col, row)
+            #need to flip the y to get the right coordinate since the boards first square
+            #is in the lower left corner, while the coordinates start in the upper left corner
             y = screenH - y - square_size 
             self.screen.blit(self.highlight_block, (x, y))
                 
@@ -165,12 +163,14 @@ class chessBoard:
 
             sys.exit()
 
-    # have to flip the row
+    
     def check_if_promotion(self):
+        # flip the row to get the right row according to the chess board
         row = 7 - self.find_row(self.from_position)
         col = self.find_column(self.from_position)
         fen = self.parse_fen()
         
+        #if it is a pawn moving to the last row it is a promotion
         if row == 1 and fen[row][col] == "P":
             return True
         elif row == 6 and fen[row][col] == "p":
@@ -180,6 +180,7 @@ class chessBoard:
 
     def check_if_legal(self):
         if self.check_if_promotion():
+            #promote to a queen
             Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position, promotion=chess.QUEEN)
         else:    
             Nf3 = chess.Move(from_square=self.from_position, to_square=self.to_position)
@@ -216,7 +217,7 @@ class chessBoard:
                         self.move_piece(square)
                         self.draw()
                     
-                    if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT:
                         sys.exit()
 
     """" AI vs AI game loop """
@@ -226,11 +227,11 @@ class chessBoard:
         
         while True:
             if self.turn % 2 == 0:
-                self.board = eval.make_move(self.board)
+                self.board = evaluation.make_move(self.board)
                 self.turn += 1
                 self.draw()
             else:
-                self.board = eval.make_move(self.board) 
+                self.board = evaluation.make_move(self.board) 
                 self.turn += 1
                 self.draw()
 
@@ -242,8 +243,9 @@ class chessBoard:
         while True:
             if self.turn % 2 == 0:
                 self.player_move()
+                
             else:
-                self.board = eval.make_move(self.board) 
+                self.board = evaluation.make_move(self.board) 
                 self.turn += 1
                 self.draw()
     
@@ -254,8 +256,10 @@ class chessBoard:
         while True:
             if self.turn % 2 == 0:
                 self.player_move()
+                self.turn += 1
             else:
                 self.player_move()
+                self.turn += 1
 
     def cmd_choices(self):
         while(1):
