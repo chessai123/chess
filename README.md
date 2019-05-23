@@ -18,4 +18,6 @@ At the start of the program you will get a few options in the terminal where you
 To chose a mode you have to write the corresponding number in the terminal
 
 To move a piece you press it's square and then the square you want to move the piece to.
-If it is a legal move it will do the move, and if it is not a legal move it will ignore the request. 
+If it is a legal move it will do the move, and if it's not a legal move it will ignore the move request.
+
+when a player wins the window shuts down
