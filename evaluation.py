@@ -1,11 +1,10 @@
-import chess
 import config
 import fenparser
-import math
 import sys
 
-TREE_DEPTH = 2
+TREE_DEPTH = 3
 PLAYER_NUM = 1
+
 
 def make_move(board):
     tree = Node(TREE_DEPTH, PLAYER_NUM, 0, board)
@@ -13,12 +12,15 @@ def make_move(board):
     board.push(move[1])
     return board
 
+
 """ Calculate the score for a piece depending on the color and position """
+
+
 def calculate_score_for_piece(piece, lowercase, row, col):
     piece = piece.upper()
     pst_pos = (config.board_length * row) + col
     position_scores = config.pst[piece]
-    #reverse the position scores for a right representation for the board
+    # reverse the position scores for a right representation for the board
     position_scores = position_scores[::-1]
 
     if lowercase:
@@ -28,6 +30,7 @@ def calculate_score_for_piece(piece, lowercase, row, col):
         piece_value = -config.piece[piece]
         pst_value = -position_scores[pst_pos]
     return pst_value + piece_value
+
 
 def calculate_score_for_position(row, col, fen):
     piece = fen[row][col]
@@ -59,7 +62,10 @@ def calculate_score_for_position(row, col, fen):
     else:
         return 0
 
+
 """ Calculate the score of the board by parsing the board state """
+
+
 def evaluate_board_score(board):
     fen = parse_fen(board)
     score = 0
@@ -68,8 +74,10 @@ def evaluate_board_score(board):
             score += calculate_score_for_position(row, col, fen)
     return score
 
+
 def parse_fen(board):
     return fenparser.FenParser(board.fen()).parse()
+
 
 class Node(object):
     def __init__(self, depth, playernum, move, board):
@@ -80,20 +88,27 @@ class Node(object):
         self.children = []
         self.generate_children()
 
-    #create the tree
+    # create the tree
     def generate_children(self):
         legal_moves = [x for x in self.board.legal_moves]
         if self.depth >= 0:
             for x in legal_moves:
-                self.board.push(x)
-                self.children.append(Node(self.depth-1, -self.playernum, x, self.board))
-                self.board.pop()
+                # Create a copy of the board for each child to avoid shared state
+                child_board = self.board.copy()
+                child_board.push(x)
+                self.children.append(
+                    Node(self.depth - 1, -self.playernum, x, child_board)
+                )
+                # No need to pop since we're using a copy
+
 
 """ Recursively calculate max possible score for positions throughout the branches in the decision tree. 
     Using Alpha-Beta pruning to reduce branch calculations.
     The alpha parameter holds the best value that the maximizer can guarantee at the level or above.
     the beta parameter holds the best value that the minimizer can guarantee at the level or above.
-    Needs to push before evaluating and pop after so the board always holds the right state. """
+    Each node has its own board copy with the move already applied. """
+
+
 def min_max(depth, node, player, alpha, beta):
     if player > 0:
         max_score = [alpha, None]
@@ -101,47 +116,41 @@ def min_max(depth, node, player, alpha, beta):
         max_score = [beta, None]
 
     if depth == 0:
-        node.board.push(node.move)
         score = evaluate_board_score(node.board)
-        node.board.pop()
         return [score, node.move]
 
-    #Maximizer
+    # Maximizer
     if player > 0:
         for child in node.children:
-            child.board.push(child.move)
-            evaluation = min_max(depth-1, child, -player, alpha, beta)
-            child.board.pop()
+            evaluation = min_max(depth - 1, child, -player, alpha, beta)
 
-            if(evaluation[0] > max_score[0]):
-                #if there is no move, we are at the top of the tree
-                #and needs to return the best move
-                if(node.move != 0):
+            if evaluation[0] > max_score[0]:
+                # if there is no move, we are at the top of the tree
+                # and needs to return the best move
+                if node.move != 0:
                     max_score = [evaluation[0], node.move]
                 else:
                     max_score = [evaluation[0], evaluation[1]]
 
             alpha = max(max_score[0], alpha)
 
-            #pruning
+            # pruning
             if beta <= alpha:
                 break
-    #minimizer
-    else: 
+    # minimizer
+    else:
         for child in node.children:
-            child.board.push(child.move)
-            evaluation = min_max(depth-1, child, -player, alpha, beta)
-            child.board.pop()
+            evaluation = min_max(depth - 1, child, -player, alpha, beta)
 
-            if(evaluation[0] < max_score[0]):
-                if(node.move != 0):
+            if evaluation[0] < max_score[0]:
+                if node.move != 0:
                     max_score = [evaluation[0], node.move]
                 else:
                     max_score = [evaluation[0], evaluation[1]]
-            
+
             beta = min(max_score[0], beta)
-            
-            #pruning
+
+            # pruning
             if beta <= alpha:
                 break
     return max_score

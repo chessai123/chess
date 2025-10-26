@@ -1,0 +1,10 @@
+# UV project configuration
+# This file is used by UV for project-specific settings
+
+# Virtual environment location (optional - UV manages this automatically)
+# .venv/
+
+# Python version constraint
+# Managed in pyproject.toml under requires-python
+
+# Additional UV-specific settings can be added here as needed
