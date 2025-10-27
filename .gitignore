@@ -76,3 +76,36 @@ venv.bak/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Chess Engine Specific
+# Benchmark and test results
+benchmark_results.json
+*.benchmark
+test_results/
+performance_logs/
+
+# PyInstaller build files
+*.spec.backup
+alfageir-xboard
+alfageir-xboard.exe
+build/alfageir-xboard/
+
+# Position cache files
+position_cache.db
+*.cache
+
+# Temporary FEN files
+*.fen.tmp
+test_positions/
+
+# Log files
+*.log
+engine.log
+xboard.log
+
+# UV specific
+.uv-cache/
+uv.lock.backup
+
+# Python compiled bytecode
+*.pyc.bak

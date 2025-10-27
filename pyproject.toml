@@ -29,7 +29,6 @@ classifiers = [
 ]
 
 dependencies = [
-    "pygame>=2.6.0",
     "chess<=1.11.2",
 ]
 
@@ -49,6 +48,7 @@ test = [
 
 [project.scripts]
 alfageir = "chessboard:main"
+alfageir-xboard = "xboard_engine:main"
 
 [project.urls]
 Homepage = "https://github.com/chessai123/chess"
@@ -56,7 +56,7 @@ Repository = "https://github.com/chessai123/chess"
 Issues = "https://github.com/chessai123/chess/issues"
 
 [tool.setuptools]
-py-modules = ["chessboard", "config", "evaluation", "fenparser"]
+py-modules = ["chessboard", "config", "evaluation", "fenparser", "xboard_engine"]
 
 [tool.setuptools.package-data]
 "*" = ["images/*.png"]

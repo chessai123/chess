@@ -277,15 +277,13 @@ class chessBoard:
             if self.turn % 2 == 0:
                 caption = "AlfaGeir vs AlfaGeir - White to move"
                 pygame.display.set_caption(caption)
-                self.board, move_time = evaluation.make_move(self.board)
-                self.last_move_time = move_time
+                self.board = evaluation.make_move(self.board)
                 self.turn += 1
                 self.draw()
             else:
                 caption = "AlfaGeir vs AlfaGeir - Black to move"
                 pygame.display.set_caption(caption)
-                self.board, move_time = evaluation.make_move(self.board)
-                self.last_move_time = move_time
+                self.board = evaluation.make_move(self.board)
                 self.turn += 1
                 self.draw()
 

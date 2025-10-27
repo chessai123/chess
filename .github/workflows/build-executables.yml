@@ -1,0 +1,104 @@
+name: Build Windows Executable
+
+on:
+  push:
+    branches: [ main, testing ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller chess pygame
+    
+    - name: Build Windows executable
+      run: |
+        pyinstaller --onefile --name alfageir-xboard.exe --console --clean xboard_engine.py
+    
+    - name: Test executable
+      run: |
+        echo xboard | dist/alfageir-xboard.exe
+        echo "Executable test completed"
+    
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: alfageir-xboard-windows
+        path: dist/alfageir-xboard.exe
+        retention-days: 30
+    
+    - name: Create release archive
+      run: |
+        mkdir release
+        cp dist/alfageir-xboard.exe release/
+        cp EXECUTABLE_README.md release/README.md
+        Compress-Archive -Path release/* -DestinationPath alfageir-chess-windows.zip
+    
+    - name: Upload release archive
+      uses: actions/upload-artifact@v3
+      with:
+        name: alfageir-chess-windows-release
+        path: alfageir-chess-windows.zip
+        retention-days: 90
+
+  build-linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller chess pygame
+    
+    - name: Build Linux executable
+      run: |
+        pyinstaller --onefile --name alfageir-xboard --console --clean xboard_engine.py
+    
+    - name: Test executable
+      run: |
+        echo "xboard" | ./dist/alfageir-xboard
+        echo "Executable test completed"
+    
+    - name: Upload Linux executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: alfageir-xboard-linux
+        path: dist/alfageir-xboard
+        retention-days: 30
+    
+    - name: Create release archive
+      run: |
+        mkdir release
+        cp dist/alfageir-xboard release/
+        cp EXECUTABLE_README.md release/README.md
+        chmod +x release/alfageir-xboard
+        tar czf alfageir-chess-linux.tar.gz -C release .
+    
+    - name: Upload release archive
+      uses: actions/upload-artifact@v3
+      with:
+        name: alfageir-chess-linux-release
+        path: alfageir-chess-linux.tar.gz
+        retention-days: 90
